@@ -1,30 +1,34 @@
-# Local MCP Chatbot (Streamlit + Ollama/Qwen + MCP)
+# Local LLM + MCP Chatbot
 
-## Run
-1. Start Ollama and pull a Qwen model that supports tools: `ollama pull qwen3` (or `qwen2.5`).
-2. Double-click **run.bat** (it builds its own `.mcpenv` folder; never copy an old `.venv` in) (Windows) or `./run.sh`. First run installs packages automatically.
-   Or manually: `pip install -r requirements.txt` then `streamlit run app.py`.
+A simple chatbot that runs fully on your own computer. It uses a local Qwen
+model through Ollama, a Streamlit web interface, and the Model Context
+Protocol (MCP) so the model can use real tools.
 
-## Files
-- `app.py` - Streamlit chat UI + tool-calling loop
-- `mcp_server.py` - MCP server (time, calculator, files in `workspace/`, system info)
-- `mcp_config.json` - which MCP servers the chatbot connects to
-- `workspace/` - the only folder the file tools can read/write
+Built for teaching: students can see how an AI decides to call a tool,
+and then build their own.
 
-## MCP server
-The app auto-starts `mcp_server.py` on http://127.0.0.1:8000/mcp. To run it yourself, double-click
-`start_mcp_server.bat` first. If port 8000 is busy, change the port in the sidebar URL.
+## What it can do
+- Chat with a local Qwen model (no cloud, no API key)
+- Call MCP tools: calculator, current time, read and write files in a safe folder
+- Show every tool call (name, arguments, result) inside the chat
+- Connect to online MCP servers such as GitHub using a personal access token
+- Let you choose which tools the model can use
 
-## Add MCP
-- New tool: add a function with `@mcp.tool` in `mcp_server.py`, click **Reload tools**.
-- Another MCP server: add it to `mcp_config.json` under `mcpServers`, e.g.
-  `"other": {"command": "npx", "args": ["-y", "some-mcp-server"]}`
-  (tool names get prefixed with the server name when there are several servers).
+## How it works
+1. You ask a question in the Streamlit app (the MCP client).
+2. Qwen decides whether it needs a tool.
+3. The MCP server runs the tool and returns the result.
+4. Qwen uses the result to write the final answer.
 
-## Troubleshooting
-- Blank page before: the three source files were empty. Now filled.
-- "Cannot reach Ollama": start the Ollama app / `ollama serve`.
-- Model ignores tools: use a tool-capable model (qwen3, qwen2.5, llama3.1).
+The model never runs code itself. It only requests a tool.
 
-## Still failing?
-Double-click `diagnose.bat`, then send the contents of `diagnose.txt`.
+## Requirements
+- Windows, macOS or Linux
+- Python 3.10 or newer
+- Ollama with a tool-capable model, for example:
+  `ollama pull qwen2.5:3b` (or `qwen3`)
+
+## Quick start
+1. Install and open Ollama, then pull a model.
+2. Download this repository and open the folder in a terminal.
+3. Create an environment and install packages:
